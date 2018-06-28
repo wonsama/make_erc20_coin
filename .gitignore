@@ -59,3 +59,13 @@ typings/
 
 # next.js build output
 .next
+
+# added Mac Temp
+.DS_Store
+
+# added test 파일
+*.test.js
+
+# added 컴파일된 계약
+sama-coin/build/contracts/
+
