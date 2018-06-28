@@ -28,7 +28,7 @@ ERC20기반 코인을 만들어보도록 하자
 * request 1 ether from faucet 버튼을 누름
 * 몇 분 있음 도착 됨, 여러번 요청 가능한 것 같음 5 eth 받음
 
-#### Kovan : 코인요청
+#### Kovan : 코인요청 
 
 * https://gitter.im/kovan-testnet/faucet 접속
 * 주소 정보를 넣으면 3 eth 줌
@@ -53,7 +53,6 @@ npm init -y
 #### 4. 의존성 설치
 
 ```
-npm install zeppelin-solidity
 npm install web3
 npm install ethereumjs-wallet
 npm install dotenv
@@ -70,11 +69,11 @@ import "zeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
   Samacoin을 설정
 */
 contract Samacoin is StandardToken {
-    string public name = "Samacoin";
+    string public name = "Samacoin"; 
     string public symbol = "SAMA";        //통화단위
     uint public decimals = 18;            //자리수
-    uint256 public INITIAL_SUPPLY = 10000 * (10 ** decimals); //초기 공급량 : 1억개로 함
-
+    uint256 public INITIAL_SUPPLY = 10000 * (10 ** decimals); //초기 공급량 : 1억개로 함 
+ 
     mapping (address => uint256) public balanceOf;
 
     //생성자
@@ -88,7 +87,7 @@ contract Samacoin is StandardToken {
 
 ```
 var Samacoin = artifacts.require("./Samacoin.sol");
-
+ 
 module.exports = function(deployer) {
     deployer.deploy(Samacoin);
 };
