@@ -60,7 +60,7 @@ npm install dotenv
 npm install truffle-hdwallet-provider
 ```
 
-#### ./contracts/Samacoin.js 작성
+#### ./contracts/Samacoin.sol 작성
 
 ```
 pragma solidity ^0.4.23;
@@ -75,11 +75,10 @@ contract Samacoin is StandardToken {
     uint public decimals = 18;            //자리수
     uint256 public INITIAL_SUPPLY = 10000 * (10 ** decimals); //초기 공급량 : 1억개로 함
 
-    mapping (address => uint256) public balanceOf;
-
     //생성자
     constructor() public {
-        balanceOf[msg.sender] = INITIAL_SUPPLY;
+        totalSupply_ = INITIAL_SUPPLY;
+        balances[msg.sender] = INITIAL_SUPPLY;
     }
 }
 ```
@@ -162,6 +161,61 @@ Saving artifacts...
 * 위에서 생성한 Samacoin 주소를 복사하여 MeataMask 토큰에 추가
 
 0xff838f5731625d1a12ad60d17af2e08144e6263e
+
+# contract 배포시 오류 케이스
+
+#### exceeds block gas limit OR insufficient funds for gas * price + value 에러 발생시
+* truffle.js 및 1_initial_migration.js 파일에 gas, gasPrice 값을 명시해 본다.
+* https://iancoleman.io/bip39/ (1)이 사이트에서 12단어 영어로 생성. 단, coin 은 ETH 로 선택.
+(2)Derived Addresses 리스트에서 첫번째 Private Key 를 복사해서 메타마스크에서 import
+(3).env 파일에 mnemonic 은 방금 생성한 12 단어로 교체
+
+# truffle 테스트 및 디버깅하기
+* 프로젝트 폴더에 test로 시작하는 js 파일을 생성. (ex:test_samacoin.js)
+```
+// test_samacoin.js
+var Samacoin = artifacts.require("Samacoin");
+
+//console.log('test...');
+contract("Samacoin",function(accounts){
+	it("should transfer right token",function(){
+		var token;
+		var bal = 10**22;
+		Samacoin.deployed()
+		.then(function(instance){
+			token = instance;
+			return token.transfer(accounts[1],100);
+		})
+		.then(function(){
+			return token.balanceOf.call(accounts[0]);
+		})
+		.then(function(result){
+			assert.equal(result.toNumber(),bal,'accounts[0] balance is wrong');
+			return token.balanceOf.call(accounts[1]);
+		})
+		.then(function(result){
+			assert.equal(result.toNumber(),100,'accounts[1] balance is wrong');
+		})
+		.catch(e => {
+			console.log(e);
+		});
+	});
+});
+
+```
+* 콘솔창을 열어 다음과 같이 입력한다.
+  truffle develop
+  truffle(develop)> compile (기존에 build 디렉토리가 있으면 안되니 지운다.)
+  truffle(develop)> migrate --reset
+  truffle(develop)> test
+
+* 콘솔창을 하나 더 연다
+  truffle develop --log
+  로그의 Transaction: 0x24c20d9f8cb67d2c1d16d930177c57bf972718957dd7f82d98f18c6ebef56b00
+  부분의 tx hash 값으로 디버깅한다.
+  truffle(develop)> debug 0x24c20d9f8cb67d2c1d16d930177c57bf972718957dd7f82d98f18c6ebef56b00
+
+
 
 # 참조링크
 
